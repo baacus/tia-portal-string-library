@@ -1,5 +1,5 @@
 # tia-portal-string-library
-String functions that can be used for TIA Portal V14 projects.
+String functions that can be used for TIA Portal V14 SP1 projects.
 
 
 Included functions:
