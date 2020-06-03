@@ -1,0 +1,288 @@
+﻿FUNCTION "Reverse_String" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      in_string : String;   // Input string to be reversed
+   END_VAR
+
+   VAR_OUTPUT 
+      out_string : String;   // Reversed output string
+   END_VAR
+
+   VAR_TEMP 
+      temp_char : Array[1..#size] of Char;
+      i : Int;
+      half_length : Int;
+      cnt : UInt;
+      temp : Char;
+      length : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      size : Int := 254;
+   END_VAR
+
+
+BEGIN
+	IF LEN(#in_string) = 0 THEN
+	    #out_string := '';
+	    RETURN;
+	END_IF;
+	
+	#length := LEN(#in_string);
+	#half_length := REAL_TO_INT(IN := (INT_TO_REAL(LEN(#in_string)) / 2.0));
+	
+	Strg_TO_Chars(Strg := #in_string,
+	              pChars := 0,
+	              Cnt => #cnt,
+	              Chars := #temp_char);
+	
+	FOR #i := 1 TO #half_length DO
+	    #temp := #temp_char[#i];
+	    #temp_char[#i] := #temp_char[#length + 1 - #i];
+	    #temp_char[#length + 1 - #i] := #temp;
+	END_FOR;
+	
+	FOR #i := #length + 1 TO #size DO
+	    #temp_char[#i] := '$00';
+	END_FOR;
+	
+	Chars_TO_Strg(Chars := #temp_char,
+	              pChars := 0,
+	              Cnt := 0,
+	              Strg => #out_string);
+	
+	
+END_FUNCTION
+
+FUNCTION "Replace_Char" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      in_string : String;   // Input string to be modified
+      find_char : Char;   // Character to be changed
+      replace_char : Char;   // Character to be replaced
+   END_VAR
+
+   VAR_OUTPUT 
+      out_string : String;   // Modified output string
+   END_VAR
+
+   VAR_TEMP 
+      temp_char : Array[1..#size] of Char;
+      str_char : Array[1..#size] of Char;
+      cnt : UInt;
+      i : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      size : Int := 254;
+   END_VAR
+
+
+BEGIN
+	IF LEN(#in_string) = 0 THEN
+	    #out_string := '';
+	    RETURN;
+	END_IF;
+	
+	Strg_TO_Chars(Strg := #in_string,
+	              pChars := 0,
+	              Cnt => #cnt,
+	              Chars := #str_char);
+	
+	FOR #i := 1 TO #size DO
+	    IF #str_char[#i] = #find_char THEN
+	        #temp_char[#i] := #replace_char;
+	    ELSE
+	        #temp_char[#i] := #str_char[#i];
+	    END_IF;
+	END_FOR;
+	
+	FOR #i := LEN(#in_string) + 1 TO #size DO
+	    #temp_char[#i] := '$00';
+	END_FOR;
+	
+	Chars_TO_Strg(Chars := #temp_char,
+	              pChars := 0,
+	              Cnt := 0,
+	              Strg => #out_string);
+	
+END_FUNCTION
+
+FUNCTION "Remove_Char" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      in_string : String;   // Input string to be modified
+      in_char : Char;   // Character to be removed
+   END_VAR
+
+   VAR_OUTPUT 
+      out_string : String;   // Modified output string
+   END_VAR
+
+   VAR_TEMP 
+      temp_char : Array[1..#size] of Char;
+      str_char : Array[1..#size] of Char;
+      cnt : UInt;
+      i : Int;
+      ind : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      size : Int := 254;
+   END_VAR
+
+
+BEGIN
+	IF LEN(#in_string) = 0 THEN
+	    #out_string := '';
+	    RETURN;
+	END_IF;
+	
+	Strg_TO_Chars(Strg := #in_string,
+	              pChars := 0,
+	              Cnt => #cnt,
+	              Chars := #str_char);
+	
+	#ind := 1;
+	
+	FOR #i := 1 TO #size DO
+	    IF #str_char[#i] <> #in_char THEN
+	        #temp_char[#ind] := #str_char[#i];
+	        #ind += 1;
+	    END_IF;
+	END_FOR;
+	
+	FOR #i := #ind TO #size DO
+	    #temp_char[#i] := '$00';
+	END_FOR;
+	
+	Chars_TO_Strg(Chars := #temp_char,
+	              pChars := 0,
+	              Cnt := 0,
+	              Strg => #out_string);
+	
+END_FUNCTION
+
+FUNCTION "Find_Chars" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      in_string : String;   // Input string to be searched
+      in_char : Char;   // Character to be searched for
+      find_match : Int;   // Order number of the character
+   END_VAR
+
+   VAR_OUTPUT 
+      first_index : Int;   // First index of the character
+      last_index : Int;   // Last index of the character
+      match_index : Int;   // Index whose the order of character equals to find_match
+   END_VAR
+
+   VAR_TEMP 
+      temp_char : Array[1..#size] of Char;
+      cnt : UInt;
+      i : Int;
+      match : Int;
+      count : Int;
+   END_VAR
+
+   VAR CONSTANT 
+      size : Int := 254;
+   END_VAR
+
+
+BEGIN
+	#match := #first_index := #last_index := #match_index := -1;
+	#count := 0;
+	
+	IF LEN(#in_string) = 0 THEN
+	    RETURN;
+	END_IF;
+	
+	
+	Strg_TO_Chars(Strg := #in_string,
+	              pChars := 0,
+	              Cnt => #cnt,
+	              Chars := #temp_char);
+	
+	FOR #i := 1 TO #size DO
+	    IF #temp_char[#i] = #in_char THEN
+	        #match := #i;
+	        IF #first_index = -1 THEN
+	            #first_index := #match;
+	        END_IF;
+	        #count += 1;
+	    END_IF;
+	    IF #count = #find_match THEN
+	        #match_index := #match;
+	    END_IF;
+	END_FOR;
+	
+	#last_index := #match;
+END_FUNCTION
+
+FUNCTION "Split_String" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      in_string : String;
+      split_char : Char;
+   END_VAR
+
+   VAR_OUTPUT 
+      out_string_array : Array[1..#size] of String;
+   END_VAR
+
+   VAR_TEMP 
+      i : Int;
+      temp_str : String;
+      sep_index : Int;
+      "name" : String;
+      result : String;
+      left_str : String;
+      temp_arr : Array[1..#size] of String;
+   END_VAR
+
+   VAR CONSTANT 
+      size : Int := 10;
+   END_VAR
+
+
+BEGIN
+	IF LEN(#in_string) = 0 THEN
+	    FOR #i := 1 TO #size DO
+	        #out_string_array[#i] := '';
+	    END_FOR;
+	    RETURN;
+	END_IF;
+	IF LEN(#split_char) = 0 THEN
+	    RETURN;
+	END_IF;
+	
+	
+	#temp_str := #in_string;
+	#sep_index := FIND(IN1 := #temp_str, IN2 := #split_char);
+	#i := 1;
+	
+	WHILE NOT (#sep_index = 0 AND LEN(#temp_str) = 0) DO
+	    #left_str := '';
+	    IF #sep_index <> 0 THEN
+	        #left_str := LEFT(IN := #temp_str, L := #sep_index - 1);
+	        #temp_str := RIGHT(IN := #temp_str, L := LEN(#temp_str) - #sep_index);
+	    ELSE
+	        #left_str := #temp_str;
+	        #temp_str := '';
+	    END_IF;
+	    IF #i <= #size THEN
+	        #temp_arr[#i] := #left_str;
+	    END_IF;
+	    #sep_index := FIND(IN1 := #temp_str, IN2 := #split_char);
+	    #i += 1;
+	END_WHILE;
+	
+	#out_string_array := #temp_arr;
+END_FUNCTION
+
